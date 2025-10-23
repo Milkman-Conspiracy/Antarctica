@@ -15,7 +15,7 @@
   .bg-text {
     position: fixed;
     inset: 0;
-    z-index: 0;
+    z-index: 3;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
@@ -31,6 +31,11 @@
   }
 
   .bg-text span { white-space: nowrap; padding-right: 6px; }
+  
+  .bg-text span.clickable {
+    pointer-events: auto;
+    cursor: pointer;
+  }
 
   .center {
     position: fixed;
@@ -39,6 +44,7 @@
     align-items: center;
     justify-content: center;
     z-index: 2;
+    pointer-events: none;
   }
 
   .spinner-img {
@@ -46,6 +52,7 @@
     height: 220px;
     object-fit: cover;
     animation: spin 3s linear infinite;
+    pointer-events: none;
   }
 
   @keyframes spin {
@@ -58,7 +65,7 @@
     bottom: 18px;
     width: 100%;
     text-align: center;
-    z-index: 3;
+    z-index: 4;
     pointer-events: none;
     font-size: 12px;
     color: rgba(0,0,0,0.55);
@@ -67,6 +74,44 @@
   @media (max-width:480px) {
     .spinner-img { width: 150px; height: 150px; }
     .bg-text { font-size:12px; padding:20px; gap:8px 12px; }
+  }
+
+  #iceshockContainer {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  #iceshockContainer.active {
+    display: flex;
+  }
+
+  .iceshock-initial {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    opacity: 0;
+    image-rendering: pixelated;
+    transition: opacity 0.1s;
+  }
+
+  .iceshock-particle {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+    image-rendering: pixelated;
+  }
+
+  .iceshock-flash {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    pointer-events: none;
   }
 </style>
 </head>
@@ -77,6 +122,9 @@
   <div class="center" role="main" aria-label="Center spinner">
     <img class="spinner-img" src="MISSING texture.png" alt="Spinning PNG">
   </div>
+
+  <div id="iceshockContainer"></div>
+  <audio id="iceshockSound" src="icespell.ogg"></audio>
 
   <script>
     (function fillBackground() {
@@ -156,12 +204,198 @@
       let html = '';
       for (let i = 0; i < linesNeeded; i++) {
         const line = lines[i % lines.length];
-        html += `<span>${line}</span>`;
+        const className = line === "A little scary." ? 'clickable' : '';
+        html += `<span class="${className}">${line}</span>`;
       }
       
       container.innerHTML = html;
+
+      const clickableSpans = container.querySelectorAll('.clickable');
+      clickableSpans.forEach(span => {
+        span.addEventListener('click', () => {
+          iceshock();
+        });
+      });
     })();
+
+    const iceshockContainer = document.getElementById('iceshockContainer');
+    const iceshockAudio = document.getElementById('iceshockSound');
+    
+    const iceshockPositions = [
+      { x: -110, y: -100 },
+      { x: -50, y: -100 },
+      { x: -80, y: -50 }
+    ];
+    
+    function iceshock() {
+      iceshockContainer.classList.add('active');
+      iceshockContainer.innerHTML = '';
+      
+      const iceshockSnowflakes = [];
+      iceshockPositions.forEach((pos, index) => {
+        const img = document.createElement('img');
+        img.src = 'snowflake.png';
+        img.className = 'iceshock-initial';
+        img.style.left = `calc(50% + ${pos.x}px)`;
+        img.style.top = `calc(50% + ${pos.y}px)`;
+        iceshockContainer.appendChild(img);
+        iceshockSnowflakes.push(img);
+      });
+      
+      iceshockAudio.play();
+      
+      iceshockSnowflakes.forEach((flake, index) => {
+        setTimeout(() => {
+          flake.style.opacity = '1';
+        }, index * 50);
+      });
+      
+      setTimeout(() => {
+        iceshockExplosion(iceshockSnowflakes);
+      }, 200);
+    }
+    
+    function iceshockExplosion(iceshockSnowflakes) {
+      iceshockFlash(0, 0);
+      
+      setTimeout(() => {
+        window.location.href = '/shh';
+      }, 500);
+      
+      const iceshockParticles = [];
+      
+      iceshockPositions.forEach((centerPos, groupIndex) => {
+        const centerX = centerPos.x + 60;
+        const centerY = centerPos.y + 60;
+        const startRadius = 15;
+        
+        const separationDirX = centerX;
+        const separationDirY = centerY;
+        const separationDist = Math.sqrt(separationDirX * separationDirX + separationDirY * separationDirY);
+        const separationUnitX = separationDirX / separationDist;
+        const separationUnitY = separationDirY / separationDist;
+        
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          const startX = centerX + Math.cos(angle) * startRadius - 30;
+          const startY = centerY + Math.sin(angle) * startRadius - 30;
+          
+          const particle = document.createElement('img');
+          particle.src = 'snowflake.png';
+          particle.className = 'iceshock-particle';
+          particle.style.left = `calc(50% + ${startX}px)`;
+          particle.style.top = `calc(50% + ${startY}px)`;
+          iceshockContainer.appendChild(particle);
+          
+          iceshockParticles.push({ 
+            element: particle, 
+            centerX: centerX,
+            centerY: centerY,
+            startAngle: angle,
+            startRadius: startRadius,
+            separationX: separationUnitX,
+            separationY: separationUnitY
+          });
+        }
+      });
+      
+      iceshockSnowflakes.forEach(flake => {
+        flake.style.opacity = '0';
+      });
+      
+      iceshockParticles.forEach(particle => {
+        particle.element.style.opacity = '1';
+      });
+      
+      iceshockAnimate(iceshockParticles);
+    }
+    
+    function iceshockFlash(centerX, centerY) {
+      const circle = document.createElement('div');
+      circle.className = 'iceshock-flash';
+      
+      const startSize = 10;
+      const endSize = 80;
+      
+      circle.style.width = startSize + 'px';
+      circle.style.height = startSize + 'px';
+      circle.style.left = `calc(50% + ${centerX - startSize / 2}px)`;
+      circle.style.top = `calc(50% + ${centerY - startSize / 2}px)`;
+      circle.style.opacity = '1';
+      
+      iceshockContainer.appendChild(circle);
+      
+      const duration = 200;
+      const startTime = Date.now();
+      
+      function animateFlash() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const currentSize = startSize + (endSize - startSize) * progress;
+        circle.style.width = currentSize + 'px';
+        circle.style.height = currentSize + 'px';
+        circle.style.left = `calc(50% + ${centerX - currentSize / 2}px)`;
+        circle.style.top = `calc(50% + ${centerY - currentSize / 2}px)`;
+        
+        if (progress >= 0.85) {
+          const fadeProgress = (progress - 0.85) / 0.15;
+          circle.style.opacity = 1 - fadeProgress;
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateFlash);
+        } else {
+          circle.remove();
+        }
+      }
+      
+      requestAnimationFrame(animateFlash);
+    }
+    
+    function iceshockAnimate(iceshockParticles) {
+      const duration = 600;
+      const startTime = Date.now();
+      const expandRadius = 100;
+      const totalRotation = Math.PI * 0.8;
+      const separationAmount = 15;
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        iceshockParticles.forEach(particle => {
+          const separationProgress = Math.pow(progress, 1.5);
+          const currentCenterX = particle.centerX + (particle.separationX * separationAmount * separationProgress);
+          const currentCenterY = particle.centerY + (particle.separationY * separationAmount * separationProgress);
+          
+          const currentAngle = particle.startAngle + (totalRotation * progress);
+          
+          const expandEase = Math.pow(progress, 1.2);
+          const currentRadius = particle.startRadius + (expandRadius * expandEase);
+          
+          const x = currentCenterX + Math.cos(currentAngle) * currentRadius - 30;
+          const y = currentCenterY + Math.sin(currentAngle) * currentRadius - 30;
+          
+          particle.element.style.left = `calc(50% + ${x}px)`;
+          particle.element.style.top = `calc(50% + ${y}px)`;
+          
+          if (progress > 0.5) {
+            const fadeProgress = (progress - 0.5) / 0.5;
+            particle.element.style.opacity = 1 - fadeProgress;
+          }
+          
+          const scale = 1 + (progress * 0.2);
+          particle.element.style.transform = `scale(${scale})`;
+        });
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      }
+      
+      requestAnimationFrame(animate);
+    }
   </script>
 </body>
 </html>
-
