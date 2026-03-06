@@ -1,404 +1,95 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" href="/favicon.ico">
-<title>Welcome to the SMP</title>
-<style>
-  html,body { height:100%; margin:0; }
-  body {
-    background: #FFEB3B;
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden;
-  }
-
-  .bg-text {
-    position: fixed;
-    inset: 0;
-    z-index: 3;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    padding: 40px;
-    gap: 12px 20px;
-    pointer-events: none;
-    opacity: 0.10;
-    line-height: 1;
-    font-size: 14px;
-    color: #000;
-    transform: rotate(-4deg);
-    user-select: none;
-  }
-
-  .bg-text span { white-space: nowrap; padding-right: 6px; }
-  
-  .bg-text span.clickable {
-    pointer-events: auto;
-    cursor: pointer;
-  }
-
-  .center {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .spinner-img {
-    width: 220px;
-    height: 220px;
-    object-fit: cover;
-    animation: spin 3s linear infinite;
-    pointer-events: none;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
-
-  .caption {
-    position: fixed;
-    bottom: 18px;
-    width: 100%;
-    text-align: center;
-    z-index: 4;
-    pointer-events: none;
-    font-size: 12px;
-    color: rgba(0,0,0,0.55);
-  }
-
-  @media (max-width:480px) {
-    .spinner-img { width: 150px; height: 150px; }
-    .bg-text { font-size:12px; padding:20px; gap:8px 12px; }
-  }
-
-  #iceshockContainer {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-
-  #iceshockContainer.active {
-    display: flex;
-  }
-
-  .iceshock-initial {
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    opacity: 0;
-    image-rendering: pixelated;
-    transition: opacity 0.1s;
-  }
-
-  .iceshock-particle {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    opacity: 0;
-    image-rendering: pixelated;
-  }
-
-  .iceshock-flash {
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgb(255, 255, 255);
-    pointer-events: none;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AV Minecraft Server</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="bg-image" id="bgImage"></div>
 
-  <div class="bg-text" aria-hidden="true"></div>
+    <div class="wizard-container">
+        <div class="progress-bar">
+            <div class="progress-segment active" data-step="0"></div>
+            <div class="progress-segment" data-step="1"></div>
+            <div class="progress-segment" data-step="2"></div>
+        </div>
 
-  <div class="center" role="main" aria-label="Center spinner">
-    <img class="spinner-img" src="MISSING texture.png" alt="Spinning PNG">
-  </div>
+        <div class="card">
+            <div class="step active" data-step="0">
+                <div class="icon"><i class="fa-solid fa-cubes"></i></div>
+                <h1>Welcome to the AMADEUS SMP</h1>
+                <p class="subtitle">The official Amadeus Vienna school Minecraft server. Before you join, please review and accept our server rules.</p>
+                <button class="btn btn-primary" onclick="goTo(1)">Get Started</button>
+            </div>
 
-  <div id="iceshockContainer"></div>
-  <audio id="iceshockSound" src="icespell.ogg"></audio>
+            <div class="step" data-step="1">
+                <div class="icon"><i class="fa-solid fa-scroll"></i></div>
+                <h1>Server Rules</h1>
+                <p class="subtitle">Please read and accept the rules before continuing. We reserve the right to permanently suspend your account if you violate the rules. Extreme violations may lead to further punishment.</p>
+                <div class="rules-box">
+                    <ol>
+                        <b>Last updated March 5th, 2026</b>
+                        <li>Use common sense. Just because something isn't in these rules doesn't mean you should do said thing.</li>
+                        <li>Be respectful. No hate speech, harassment, or bullying of any kind.</li>
+                        <li>English only.</li>
+                        <li>No griefing, stealing, or destroying others' builds.</li>
+                        <li>No cheating, hacking, or exploiting bugs. If you found a bug, please let us know.</li>
+                        <li>No inappropriate builds or content.</li>
+                        <li>Keep the chat friendly and school-appropriate.</li>
+                        <li>Do not share personal information in-game.</li>
+                        <li>Follow all instructions from server moderators. If you have any questions regarding the rules, let a moderator/admin know in-game.</li>
+                        <li>Have fun!</li>
+                    </ol>
+                </div>
+                <label class="checkbox-group" onclick="toggleRules()">
+                    <input type="checkbox" id="acceptRules">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-label">I have read and agree to the server rules</span>
+                </label>
+                <button class="btn btn-primary" id="rulesNext" disabled onclick="goTo(2)">Continue</button>
+                <button class="btn btn-secondary" onclick="goTo(0)">Back</button>
+            </div>
 
-  <script>
-    (function fillBackground() {
-      const container = document.querySelector('.bg-text');
-      
-      const lines = [
-        "According to all known laws of aviation, there is no way a bee should be able to fly.",
-        "Its wings are too small to get its fat little body off the ground.",
-        "The bee, of course, flies anyway because bees don't care what humans think is impossible.",
-        "Yellow, black. Yellow, black. Yellow, black. Yellow, black.",
-        "Ooh, black and yellow!",
-        "Let's shake it up a little.",
-        "Barry! Breakfast is ready!",
-        "Coming!",
-        "Hang on a second.",
-        "Hello?",
-        "Barry?",
-        "Adam?",
-        "Can you believe this is happening?",
-        "I can't.",
-        "I'll pick you up.",
-        "Looking sharp.",
-        "Use the stairs, Your father paid good money for those.",
-        "Sorry. I'm excited.",
-        "Here's the graduate.",
-        "We're very proud of you, son.",
-        "A perfect report card, all B's.",
-        "Very proud.",
-        "Ma! I got a thing going here.",
-        "You got lint on your fuzz.",
-        "Ow! That's me!",
-        "Wave to us! We'll be in row 118,000.",
-        "Bye!",
-        "Barry, I told you, stop flying in the house!",
-        "Hey, Adam.",
-        "Hey, Barry.",
-        "A little. Special day, graduation.",
-        "Never thought I'd make it.",
-        "Three days grade school, three days high school.",
-        "Those were awkward.",
-        "Three days college. I'm glad I took a day and hitchhiked around The Hive.",
-        "You did come back different.",
-        "Hi, Barry. Artie, growing a mustache? Looks good.",
-        "Hear about Frankie?",
-        "Yeah.",
-        "You going to the funeral?",
-        "No, I'm not going.",
-        "Everybody knows, sting someone, you die.",
-        "Don't waste it on a squirrel.",
-        "Such a hothead.",
-        "I guess he could have just gotten out of the way.",
-        "I love this incorporating an amusement park into our day.",
-        "That's why we don't need vacations.",
-        "Boy, quite a bit of pomp under the circumstances.",
-        "Well, Adam, today we are men.",
-        "We are!",
-        "Bee-men.",
-        "Amen!",
-        "Hallelujah!",
-        "Students, faculty, distinguished bees,",
-        "please welcome Dean Buzzwell.",
-        "Welcome, New Hive City graduating class of 9:15.",
-        "That concludes our ceremonies And begins your career at Honex Industries!",
-        "Will we pick our job today?",
-        "I heard it's just orientation.",
-        "Heads up! Here we go.",
-        "Keep your hands and antennas inside the tram at all times.",
-        "Wonder what it'll be like?",
-        "A little scary."
-      ];
-      
-      const screenArea = window.innerWidth * window.innerHeight;
-      const estimatedLineArea = 150;
-      const linesNeeded = Math.ceil(screenArea / estimatedLineArea) * 2;
-      
-      let html = '';
-      for (let i = 0; i < linesNeeded; i++) {
-        const line = lines[i % lines.length];
-        const className = line === "A little scary." ? 'clickable' : '';
-        html += `<span class="${className}">${line}</span>`;
-      }
-      
-      container.innerHTML = html;
+            <div class="step" data-step="2">
+                <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <h1>You're All Set!</h1>
+                <p class="subtitle">You've accepted the server rules. Connect to the server using the address below. See you in-game!</p>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-label">Server goes public in</div>
+                    <div class="countdown-timer">
+                        <div class="countdown-unit">
+                            <span class="countdown-value" id="cd-days">00</span>
+                            <span>Days</span>
+                        </div>
+                        <span class="countdown-separator">:</span>
+                        <div class="countdown-unit">
+                            <span class="countdown-value" id="cd-hours">00</span>
+                            <span>Hours</span>
+                        </div>
+                        <span class="countdown-separator">:</span>
+                        <div class="countdown-unit">
+                            <span class="countdown-value" id="cd-minutes">00</span>
+                            <span>Min</span>
+                        </div>
+                        <span class="countdown-separator">:</span>
+                        <div class="countdown-unit">
+                            <span class="countdown-value" id="cd-seconds">00</span>
+                            <span>Sec</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="server-ip" onclick="copyIP()">
+                    <span class="ip-text">mc.amadeus.buzz</span>
+                    <button class="copy-btn" id="copyBtn"><i class="fa-regular fa-copy"></i> Copy</button>
+                </div>
+                <button class="btn btn-secondary" onclick="goTo(1)">Back to Rules</button>
+            </div>
+        </div>
+    </div>
 
-      const clickableSpans = container.querySelectorAll('.clickable');
-      clickableSpans.forEach(span => {
-        span.addEventListener('click', () => {
-          iceshock();
-        });
-      });
-    })();
-
-    const iceshockContainer = document.getElementById('iceshockContainer');
-    const iceshockAudio = document.getElementById('iceshockSound');
-    
-    const iceshockPositions = [
-      { x: -110, y: -100 },
-      { x: -50, y: -100 },
-      { x: -80, y: -50 }
-    ];
-    
-    function iceshock() {
-      iceshockContainer.classList.add('active');
-      iceshockContainer.innerHTML = '';
-      
-      const iceshockSnowflakes = [];
-      iceshockPositions.forEach((pos, index) => {
-        const img = document.createElement('img');
-        img.src = 'snowflake.png';
-        img.className = 'iceshock-initial';
-        img.style.left = `calc(50% + ${pos.x}px)`;
-        img.style.top = `calc(50% + ${pos.y}px)`;
-        iceshockContainer.appendChild(img);
-        iceshockSnowflakes.push(img);
-      });
-      
-      iceshockAudio.play();
-      
-      iceshockSnowflakes.forEach((flake, index) => {
-        setTimeout(() => {
-          flake.style.opacity = '1';
-        }, index * 50);
-      });
-      
-      setTimeout(() => {
-        iceshockExplosion(iceshockSnowflakes);
-      }, 200);
-    }
-    
-    function iceshockExplosion(iceshockSnowflakes) {
-      iceshockFlash(0, 0);
-      
-      setTimeout(() => {
-        window.location.href = '/shh';
-      }, 500);
-      
-      const iceshockParticles = [];
-      
-      iceshockPositions.forEach((centerPos, groupIndex) => {
-        const centerX = centerPos.x + 60;
-        const centerY = centerPos.y + 60;
-        const startRadius = 15;
-        
-        const separationDirX = centerX;
-        const separationDirY = centerY;
-        const separationDist = Math.sqrt(separationDirX * separationDirX + separationDirY * separationDirY);
-        const separationUnitX = separationDirX / separationDist;
-        const separationUnitY = separationDirY / separationDist;
-        
-        for (let i = 0; i < 6; i++) {
-          const angle = (i / 6) * Math.PI * 2;
-          const startX = centerX + Math.cos(angle) * startRadius - 30;
-          const startY = centerY + Math.sin(angle) * startRadius - 30;
-          
-          const particle = document.createElement('img');
-          particle.src = 'snowflake.png';
-          particle.className = 'iceshock-particle';
-          particle.style.left = `calc(50% + ${startX}px)`;
-          particle.style.top = `calc(50% + ${startY}px)`;
-          iceshockContainer.appendChild(particle);
-          
-          iceshockParticles.push({ 
-            element: particle, 
-            centerX: centerX,
-            centerY: centerY,
-            startAngle: angle,
-            startRadius: startRadius,
-            separationX: separationUnitX,
-            separationY: separationUnitY
-          });
-        }
-      });
-      
-      iceshockSnowflakes.forEach(flake => {
-        flake.style.opacity = '0';
-      });
-      
-      iceshockParticles.forEach(particle => {
-        particle.element.style.opacity = '1';
-      });
-      
-      iceshockAnimate(iceshockParticles);
-    }
-    
-    function iceshockFlash(centerX, centerY) {
-      const circle = document.createElement('div');
-      circle.className = 'iceshock-flash';
-      
-      const startSize = 10;
-      const endSize = 80;
-      
-      circle.style.width = startSize + 'px';
-      circle.style.height = startSize + 'px';
-      circle.style.left = `calc(50% + ${centerX - startSize / 2}px)`;
-      circle.style.top = `calc(50% + ${centerY - startSize / 2}px)`;
-      circle.style.opacity = '1';
-      
-      iceshockContainer.appendChild(circle);
-      
-      const duration = 200;
-      const startTime = Date.now();
-      
-      function animateFlash() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const currentSize = startSize + (endSize - startSize) * progress;
-        circle.style.width = currentSize + 'px';
-        circle.style.height = currentSize + 'px';
-        circle.style.left = `calc(50% + ${centerX - currentSize / 2}px)`;
-        circle.style.top = `calc(50% + ${centerY - currentSize / 2}px)`;
-        
-        if (progress >= 0.85) {
-          const fadeProgress = (progress - 0.85) / 0.15;
-          circle.style.opacity = 1 - fadeProgress;
-        }
-        
-        if (progress < 1) {
-          requestAnimationFrame(animateFlash);
-        } else {
-          circle.remove();
-        }
-      }
-      
-      requestAnimationFrame(animateFlash);
-    }
-    
-    function iceshockAnimate(iceshockParticles) {
-      const duration = 600;
-      const startTime = Date.now();
-      const expandRadius = 100;
-      const totalRotation = Math.PI * 0.8;
-      const separationAmount = 15;
-      
-      function animate() {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        iceshockParticles.forEach(particle => {
-          const separationProgress = Math.pow(progress, 1.5);
-          const currentCenterX = particle.centerX + (particle.separationX * separationAmount * separationProgress);
-          const currentCenterY = particle.centerY + (particle.separationY * separationAmount * separationProgress);
-          
-          const currentAngle = particle.startAngle + (totalRotation * progress);
-          
-          const expandEase = Math.pow(progress, 1.2);
-          const currentRadius = particle.startRadius + (expandRadius * expandEase);
-          
-          const x = currentCenterX + Math.cos(currentAngle) * currentRadius - 30;
-          const y = currentCenterY + Math.sin(currentAngle) * currentRadius - 30;
-          
-          particle.element.style.left = `calc(50% + ${x}px)`;
-          particle.element.style.top = `calc(50% + ${y}px)`;
-          
-          if (progress > 0.5) {
-            const fadeProgress = (progress - 0.5) / 0.5;
-            particle.element.style.opacity = 1 - fadeProgress;
-          }
-          
-          const scale = 1 + (progress * 0.2);
-          particle.element.style.transform = `scale(${scale})`;
-        });
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      }
-      
-      requestAnimationFrame(animate);
-    }
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
-
-
-
