@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AMADEUS SMP — Server Overview</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- same background image behaviour as index.html -->
+  <div class="bg-image" id="bgImage"></div>
+
+  <div class="wizard-container" style="max-width:960px;">
+    <div class="card" style="padding:28px 36px;">
+      <!-- header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;">
+        <div style="display:flex;gap:14px;align-items:center;">
+          <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#0ea5a8,#0284c7);display:flex;align-items:center;justify-content:center;font-weight:700;color:#051018;">
+            <span style="font-size:18px">MC</span>
+          </div>
+          <div>
+            <h1 style="margin:0;font-size:20px">AMADEUS SMP — Server overview</h1>
+            <div class="subtitle" style="margin-top:6px;font-size:13px;color:var(--text-muted)">Near-vanilla survival on Paper — stable, low-intervention multiplayer.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;">
+          <a class="btn btn-secondary" href="rules.html" role="button">Rules &amp; Punishments</a>
+          <a class="btn btn-primary" href="index.html" role="button">Return to home</a>
+        </div>
+      </div>
+
+      <!-- content -->
+      <section style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+        <div>
+          <div class="subtitle" style="font-weight:600;margin-bottom:8px">Server overview</div>
+          <div class="rules-box" style="padding:16px 18px;max-height:none;">
+            <p style="color:var(--text-muted);line-height:1.6;margin-bottom:8px;">
+              This server aims to provide a near-vanilla <strong>Minecraft: Java Edition</strong> experience. Gameplay mechanics — progression, exploration, redstone, farming and other systems — behave as players expect from the official game. The server runs on <strong>Paper</strong> for improved performance and stability while preserving vanilla mechanics.
+            </p>
+
+            <p style="color:var(--text-muted);margin:0;"><strong>Server software:</strong> Paper (performance &amp; stability for vanilla gameplay)</p>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="subtitle" style="font-weight:600;margin-bottom:8px">Client requirements</div>
+          <div class="rules-box" style="padding:14px 18px;">
+            <ul style="color:var(--text-muted);line-height:1.6;">
+              <li>Connect using the official Mojang / Microsoft <strong>Minecraft: Java Edition</strong> client. Recommended version: <strong>1.21.11</strong>.</li>
+              <li>Modified or unofficial clients that give unfair gameplay advantages (combat automation, x-ray, aim-assist, etc.) are not permitted.</li>
+              <li>Cosmetic or quality-of-life mods that do not affect game balance are generally acceptable.</li>
+              <li>Server-side anti-cheat systems are active to help ensure fair play.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="subtitle" style="font-weight:600;margin-bottom:8px">Gameplay philosophy</div>
+          <div class="rules-box" style="padding:14px 18px;">
+            <ul style="color:var(--text-muted);line-height:1.6;">
+              <li>Vanilla survival gameplay</li>
+              <li>Fair multiplayer experience</li>
+              <li>Minimal administrative interference</li>
+              <li>Long-term world stability</li>
+            </ul>
+            <p style="color:var(--text-muted);margin-top:8px;">
+              Plugins are used only for administration, moderation and technical features (permissions, rollback logging, performance monitoring). They are not intended to alter core survival mechanics.
+            </p>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="subtitle" style="font-weight:600;margin-bottom:8px">Administration &amp; moderation</div>
+          <div class="rules-box" style="padding:14px 18px;">
+            <ul style="color:var(--text-muted);line-height:1.6;">
+              <li>Block logging and rollback tools</li>
+              <li>Anti-cheat monitoring</li>
+              <li>Permission management</li>
+            </ul>
+            <p style="color:var(--text-muted);margin-top:8px;">
+              Administrative intervention is kept minimal but will occur when necessary to address griefing, cheating or severe rule violations.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div style="height:18px"></div>
+
+      <section style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+        <div>
+          <div class="subtitle" style="font-weight:600;margin-bottom:8px">Bug reports &amp; suggestions</div>
+          <div class="rules-box" style="padding:14px 18px;">
+            <p style="color:var(--text-muted);line-height:1.6;">
+              Players are strongly encouraged to report server bugs, plugin issues and performance problems. Constructive suggestions are welcome and help guide future adjustments.
+            </p>
+            <p style="color:var(--text-muted);margin-top:8px;font-size:13px;"><em>Suggested channels:</em> in-game report form, Discord or issue tracker (insert links as applicable).</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="subtitle" style="font-weight:600;margin-bottom:8px">Server stability &amp; persistence</div>
+          <div class="rules-box" style="padding:14px 18px;">
+            <p style="color:var(--text-muted);line-height:1.6;">
+              The server is configured for continuous operation (intended 24/7). Backups and logging are used to preserve world data and protect player builds. World resets are avoided unless technically necessary.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div style="height:18px"></div>
+
+      <!-- Bluemap placeholder -->
+      <div>
+        <div class="subtitle" style="font-weight:600;margin-bottom:8px">Bluemap</div>
+        <div class="rules-box" style="padding:0;overflow:hidden;display:flex;align-items:center;justify-content:center;height:320px;border-radius:10px;">
+          <!-- Replace the commented iframe below with your bluemap URL, or replace with an <img> screenshot -->
+          <!-- example:
+            <iframe src="/bluemap/index.html" style="width:100%;height:100%;border:0"></iframe>
+          -->
+          <div style="text-align:center;color:var(--text-muted);padding:18px;">
+            Bluemap placeholder — insert Bluemap iframe or static map image here.
+          </div>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <!-- footer actions -->
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="color:var(--text-muted);font-size:13px;">Recommended client: <strong>Java 1.21.11</strong> — Server runs on <strong>Paper</strong></div>
+        <div style="display:flex;gap:10px;">
+          <a class="btn btn-secondary" href="rules.html">Rules &amp; Punishments</a>
+          <a class="btn btn-primary" href="index.html">Proceed to index</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // load bg image same as index behaviour
+    (function () {
+      var img = new Image();
+      img.onload = function () { document.getElementById('bgImage').classList.add('loaded'); };
+      img.src = 'https://files.catbox.moe/ixl2qb.png';
+    })();
+  </script>
+</body>
+</html>
