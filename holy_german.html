@@ -1,0 +1,517 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .container { padding: 1rem 0; }
+  .header { margin-bottom: 1.5rem; }
+  .header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .header p { font-size: 14px; color: var(--color-text-secondary); }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+  .filter-btn { font-size: 13px; padding: 5px 12px; border-radius: 999px; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { background: var(--color-background-secondary); }
+  .filter-btn.active { background: var(--color-background-primary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; cursor: pointer; transition: border-color 0.15s; }
+  .card:hover { border-color: var(--color-border-primary); }
+  .card.open { border-color: var(--color-border-secondary); }
+  .card-header { padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .badge-formal { background: #E6F1FB; color: #0C447C; }
+  .badge-informal { background: #EAF3DE; color: #27500A; }
+  .badge-both { background: #FAEEDA; color: #633806; }
+  .card-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+  .toggle { font-size: 18px; color: var(--color-text-secondary); transition: transform 0.2s; line-height: 1; }
+  .card.open .toggle { transform: rotate(45deg); }
+  .card-body { display: none; border-top: 0.5px solid var(--color-border-tertiary); }
+  .card.open .card-body { display: block; }
+  .section { padding: 14px 16px; }
+  .section + .section { border-top: 0.5px solid var(--color-border-tertiary); }
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .desc-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.6; }
+  .criteria-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .criteria-list li { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; display: flex; gap: 8px; }
+  .criteria-list li::before { content: "•"; color: var(--color-text-secondary); flex-shrink: 0; }
+  .example-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; font-size: 12.5px; color: var(--color-text-primary); line-height: 1.65; white-space: pre-wrap; font-family: var(--font-mono); }
+  .tip-box { background: #E6F1FB; border-radius: var(--border-radius-md); padding: 10px 12px; font-size: 12.5px; color: #0C447C; line-height: 1.55; }
+</style>
+
+<div class="container">
+  <div class="header">
+    <h1>IB German Ab Initio — Text types</h1>
+    <p>Click any card to see the description, IB criteria, a writing guide, and an example.</p>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filter('all', this)">All</button>
+    <button class="filter-btn" onclick="filter('formal', this)">Formal</button>
+    <button class="filter-btn" onclick="filter('informal', this)">Informal</button>
+    <button class="filter-btn" onclick="filter('both', this)">Formal or informal</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const types = [
+  {
+    id: "artikel",
+    title: "Artikel (Article)",
+    register: "both",
+    desc: "A structured piece of writing published in a newspaper, magazine, or school publication. It informs, analyses, or comments on a topic for a broad readership.",
+    criteria: [
+      "Headline (Überschrift) — catchy and relevant",
+      "Author name (Verfasser) below the headline",
+      "Date (Datum)",
+      "Clear structure: introduction (Einleitung), main body (Hauptteil), conclusion (Schluss)",
+      "Register matches the publication (formal for newspaper, semi-formal for school magazine)"
+    ],
+    guide: `How to write it:
+1. Write a clear, engaging headline.
+2. Add your name and the date below the headline.
+3. Introduction: state the topic and why it matters.
+4. Main body: develop 2–3 points with detail or examples.
+5. Conclusion: summarise or give a clear final opinion.
+6. Keep paragraphs focused — one idea per paragraph.`,
+    example: `Schüler fordern mehr Klimaschutz an Schulen
+Von A. Maier | 4. Mai 2026
+
+Immer mehr Schülerinnen und Schüler engagieren sich für das Klima.
+An der Stadtschule Wien haben 200 Jugendliche eine Petition gestartet.
+
+Sie fordern Solarpanele auf dem Schuldach und vegetarisches Essen
+in der Mensa. Die Schulleiterin zeigt Verständnis für die Forderungen.
+
+Experten betonen: Schulen spielen eine wichtige Rolle im Klimaschutz.
+Ein erster Schritt wäre, weniger Plastik in der Schule zu verwenden.`
+  },
+  {
+    id: "blog",
+    title: "Blog (Blog post)",
+    register: "informal",
+    desc: "A personal, conversational online post addressed directly to readers. It shares opinions, experiences, or tips and encourages reader interaction.",
+    criteria: [
+      "Headline (Überschrift)",
+      "Date or time (Datum oder Uhrzeit)",
+      "Closing remark and links (Abschlussbemerkung, Links)",
+      "Comments section or invitation to comment",
+      "Direct address to the reader (e.g. Was denkt ihr darüber?)"
+    ],
+    guide: `How to write it:
+1. Write an engaging headline.
+2. Add the date (and optionally the time).
+3. Write in a friendly, personal tone — use "du/ihr".
+4. Share your opinion or experience clearly.
+5. End with a question or call to action for readers.
+6. Optionally add links or a comments section prompt.`,
+    example: `Mein erstes Mal in Wien – ein Abenteuer!
+4. Mai 2026 | 10:34 Uhr
+
+Letztes Wochenende war ich zum ersten Mal in Wien — und es war
+absolut fantastisch! Der Prater, die Kaffeehäuser, die Musik überall…
+
+Mein Lieblingsmoment? Ein heißer Kaffee mit Apfelstrudel beim Café
+Central. Einfach unglaublich! Habt ihr Tipps für meinen nächsten Besuch?
+
+Schreibt es in die Kommentare — ich freue mich auf eure Ideen! 👇
+[Mehr Reiseberichte] | [Kontakt]
+
+3 Kommentare`
+  },
+  {
+    id: "einladung",
+    title: "Einladung (Invitation)",
+    register: "both",
+    desc: "A formal or informal written invitation to an event. It provides all essential details so the recipient knows what, when, and where.",
+    criteria: [
+      "Salutation (Anrede) — formal (Sehr geehrte/r) or informal (Liebe/r)",
+      "Details of the event: date, time, and/or location",
+      "Request for an RSVP or contact details",
+      "Sign-off and signature (Unterschrift)"
+    ],
+    guide: `How to write it:
+1. Open with an appropriate salutation.
+2. State clearly what the event is.
+3. Give the date, time, and location.
+4. Include any useful extra details (dress code, what to bring).
+5. Ask for an RSVP or provide contact information.
+6. Close with a warm sign-off and your name.`,
+    example: `Liebe Anna,
+
+ich möchte dich herzlich zu meiner Geburtstagsfeier einladen!
+
+Datum: Samstag, 10. Mai 2026
+Uhrzeit: 18:00 Uhr
+Ort: Musterstraße 5, 1010 Wien
+
+Es gibt Musik, Essen und viele Überraschungen!
+
+Bitte gib mir bis zum 5. Mai Bescheid, ob du kommen kannst.
+Du erreichst mich unter: lena@email.at
+
+Ich freue mich sehr auf dich!
+Viele Grüße,
+Lena`
+  },
+  {
+    id: "email",
+    title: "E-Mail (Email)",
+    register: "both",
+    desc: "A digital message with a clear sender, recipient, and subject line. It can be formal (to a teacher, company) or informal (to a friend).",
+    criteria: [
+      "From: sender address (Von: mbauer@gmail.com)",
+      "To: recipient address (Zu: annamuller@gmail.com)",
+      "Subject line (Betreff)",
+      "Salutation (Anrede)",
+      "Closing formula (Schlussformel)",
+      "Reference to the reader — ask questions to engage them"
+    ],
+    guide: `How to write it:
+1. Fill in From, To, and a clear Subject line.
+2. Use an appropriate salutation.
+3. State your purpose clearly in the first line.
+4. Develop your points in short paragraphs.
+5. Engage the reader — ask at least one question.
+6. End with an appropriate closing formula and your name.`,
+    example: `Von: max.mustermann@gmail.com
+Zu: info@jugendzentrum-wien.at
+Betreff: Anfrage zu Sportkursen
+
+Sehr geehrte Damen und Herren,
+
+ich habe auf Ihrer Website gesehen, dass Sie verschiedene Sportkurse
+für Jugendliche anbieten. Ich interessiere mich sehr für Ihre Angebote.
+
+Könnten Sie mir bitte mehr Informationen zu den Kurszeiten und den
+Kosten schicken? Gibt es auch Kurse für Anfänger?
+
+Ich freue mich auf Ihre Antwort.
+
+Mit freundlichen Grüßen,
+Max Mustermann`
+  },
+  {
+    id: "flugblatt",
+    title: "Flugblatt (Flyer/Leaflet)",
+    register: "both",
+    desc: "A short, eye-catching document designed to inform or persuade a large audience quickly. Often used for events, campaigns, or announcements.",
+    criteria: [
+      "Headline (Überschrift) — bold and attention-grabbing",
+      "Key information and facts (Information & Fakten)",
+      "Contact details: email, website, or phone number"
+    ],
+    guide: `How to write it:
+1. Write a short, bold headline that grabs attention immediately.
+2. Use short sentences or bullet points — readers scan, not read.
+3. Include the most important facts (what, when, where, why).
+4. Add contact details clearly at the bottom.
+5. A slogan or call to action strengthens the flyer.`,
+    example: `🌿 MACH MIT! SCHÜLER FÜR DAS KLIMA 🌿
+
+Komm zu unserem Klimamarsch in Wien!
+
+📅 Datum: 15. Mai 2026
+📍 Ort: Rathausplatz, Wien
+🕐 Uhrzeit: 14:00 Uhr
+
+Gemeinsam für eine grüne Zukunft!
+Jede Stimme zählt.
+
+Mehr Infos:
+🌐 www.schuelerfuerklima.at
+📧 info@schuelerfuerklima.at
+📞 +43 1 234 5678`
+  },
+  {
+    id: "interview",
+    title: "Interview (Interview)",
+    register: "both",
+    desc: "A written record of a conversation between an interviewer and a subject. Used in journalism or school publications to present someone's views or experiences.",
+    criteria: [
+      "Headline and interviewer/author (Überschrift und Verfasser), optionally the newspaper",
+      "Question-and-answer format (Frage-Antwort Format)",
+      "Closing remark (abschließende Bemerkung)"
+    ],
+    guide: `How to write it:
+1. Write a headline and add the author's name (and publication if relevant).
+2. Introduce the interviewee briefly (1–2 sentences).
+3. Use a clear Q&A format — label each speaker.
+4. Write 4–6 exchanges covering the topic from different angles.
+5. End with a brief closing remark or thank you.`,
+    example: `„Sport verändert mein Leben" – Ein Gespräch mit Fußballerin Mia Huber
+Interview von T. Bauer | Schülerzeitung Wien, Mai 2026
+
+Mia Huber (16) spielt seit vier Jahren Fußball beim SV Wien. Wir haben
+sie nach ihrem Alltag als Sportlerin gefragt.
+
+Frage: Wann hast du mit dem Fußball angefangen?
+Mia: Mit zwölf Jahren. Mein Bruder hat mich zum ersten Training mitgenommen.
+
+Frage: Wie oft trainierst du pro Woche?
+Mia: Dreimal, manchmal auch viermal. Es ist viel, aber ich liebe es.
+
+Frage: Was ist dein größtes Ziel?
+Mia: Ich möchte eines Tages für die Nationalmannschaft spielen.
+
+Vielen Dank, Mia — wir drücken dir die Daumen!`
+  },
+  {
+    id: "posting",
+    title: "Posting in sozialen Medien (Social media post)",
+    register: "informal",
+    desc: "A short public message shared on a social media platform. It is brief, direct, and often includes hashtags, links, or a call to action.",
+    criteria: [
+      "Author/username (Verfasser)",
+      "Date (Datum)",
+      "Links or contact details"
+    ],
+    guide: `How to write it:
+1. Write as the named author or with a username.
+2. Keep the message short and punchy — a few sentences at most.
+3. Add the date.
+4. Use hashtags to increase reach.
+5. Include a link or contact detail where relevant.
+6. Use an informal, energetic tone.`,
+    example: `@lena_entdeckt | 4. Mai 2026
+
+Gerade in Wien angekommen und schon verliebt! ❤️ Diese Stadt ist
+einfach magisch — das Essen, die Architektur, die Menschen.
+
+Wer hat noch Tipps für mich? Schreibt mir gerne!
+
+#Wien #Reisen #Österreich #Städtereise
+🔗 www.lena-entdeckt.at`
+  },
+  {
+    id: "praesentation",
+    title: "Präsentation (Presentation)",
+    register: "formal",
+    desc: "A spoken delivery to an audience, often with slides or notes. Used in school, at events, or in professional contexts to inform or persuade.",
+    criteria: [
+      "Address/greeting of the audience (Anrede oder Begrüßung der Zuhörergruppe)",
+      "Closing remark or thank you (Schlussbemerkung oder Danksagung)",
+      "Contact details for further information, or invitation for questions"
+    ],
+    guide: `How to write it:
+1. Open by greeting your audience formally.
+2. Introduce yourself and state the topic of your presentation.
+3. Outline what you will cover (briefly).
+4. Present your points clearly — use transitions between sections.
+5. Summarise your key message at the end.
+6. Thank the audience and invite questions or give contact details.`,
+    example: `Guten Morgen, liebe Mitschülerinnen und Mitschüler,
+liebe Lehrerinnen und Lehrer!
+
+Mein Name ist Jonas Schmidt, und heute spreche ich über das Thema:
+Klimawandel und was wir als Schüler tun können.
+
+Ich werde drei Punkte ansprechen: die Ursachen, die Folgen und mögliche
+Lösungen — besonders in unserem Alltag.
+
+[Hauptteil der Präsentation...]
+
+Zusammenfassend möchte ich sagen: Jede kleine Handlung zählt.
+Gemeinsam können wir etwas verändern.
+
+Vielen Dank für Ihre Aufmerksamkeit! Haben Sie Fragen?
+Bei weiteren Fragen erreichen Sie mich unter: jonas@schule.at`
+  },
+  {
+    id: "werbung",
+    title: "Werbung (Advertisement)",
+    register: "both",
+    desc: "Persuasive text designed to promote a product, service, or event. It targets a specific audience and uses positive, compelling language.",
+    criteria: [
+      "Positive information about the product (positive Informationen über das Produkt)",
+      "Aimed at a specific target group (richtet sich an die Zielgruppe)",
+      "Attempts to persuade (versucht zu überreden)"
+    ],
+    guide: `How to write it:
+1. Identify your target audience and write for them specifically.
+2. Start with a catchy slogan or bold claim.
+3. Highlight 2–3 strong benefits of the product or service.
+4. Use persuasive language: superlatives, rhetorical questions, imperatives.
+5. End with a clear call to action (Jetzt kaufen! / Ruf an!).
+6. Keep it short, punchy, and positive throughout.`,
+    example: `Entdecke die neue SportFit App — dein persönlicher Trainingspartner!
+
+Egal ob Anfänger oder Profi: SportFit passt sich dir an.
+
+✔ Über 200 Trainingsvideos für zu Hause
+✔ Persönliche Ernährungspläne
+✔ Fortschritte einfach verfolgen
+
+Noch nie war gesund leben so einfach!
+
+👉 Jetzt kostenlos herunterladen: www.sportfit-app.at
+Nur für kurze Zeit: 3 Monate Premium gratis!`
+  },
+  {
+    id: "rede",
+    title: "Rede (Speech)",
+    register: "both",
+    desc: "A formal or informal spoken text delivered live to an audience. It aims to inform, motivate, or persuade using direct address and rhetorical techniques.",
+    criteria: [
+      "Address to the audience — formal or informal depending on the context",
+      "Persuasive language (überzeugende Sprache)",
+      "Closing/farewell, invitation for questions",
+      "Contact details if relevant"
+    ],
+    guide: `How to write it:
+1. Open with a direct address to your audience (formal or informal as appropriate).
+2. Introduce your topic with a hook — a question, statistic, or story.
+3. Develop 2–3 main points with supporting examples.
+4. Use persuasive techniques: repetition, rhetorical questions, direct appeals.
+5. Close with a memorable final statement.
+6. Thank the audience and invite questions.`,
+    example: `Liebe Mitschülerinnen und Mitschüler!
+
+Stellt euch vor: In 30 Jahren ist Wien überflutet. Klingt das wie
+Science-Fiction? Leider nicht.
+
+Der Klimawandel ist keine ferne Bedrohung — er ist hier, und er
+betrifft uns alle. Deshalb müssen WIR handeln. Und zwar jetzt.
+
+Was kann jeder von uns tun? Weniger Fleisch essen. Mit dem Fahrrad
+fahren. Energie sparen. Kleine Schritte — große Wirkung.
+
+Ich bitte euch: Macht mit! Gemeinsam können wir etwas verändern.
+
+Danke fürs Zuhören. Habt ihr Fragen?`
+  },
+  {
+    id: "brief",
+    title: "Brief (Letter)",
+    register: "both",
+    desc: "A written letter sent to a specific person or organisation. It can be formal (to institutions, employers) or informal (to friends, family).",
+    criteria: [
+      "Recipient address (Adressat)",
+      "Sender address (Absender)",
+      "Subject line (Betreff)",
+      "Date and place (Datum und Ort)",
+      "Greeting and sign-off — formal or informal as appropriate",
+      "Signature (Unterschrift)",
+      "Reference to the reader (e.g. Wie geht es Ihnen/dir/euch?)"
+    ],
+    guide: `How to write it:
+1. Add the sender's address (top right) and recipient's address (top left).
+2. Write the place and date.
+3. Add a subject line (Betreff).
+4. Open with the appropriate greeting.
+5. Ask after the reader early on to show consideration.
+6. Write your message clearly in organised paragraphs.
+7. Close with the correct formal or informal sign-off and your signature.`,
+    example: `Max Mustermann
+Musterstraße 1
+1010 Wien
+
+Stadt Wien – Jugendamt
+Rathausplatz 1
+1010 Wien
+
+Wien, 4. Mai 2026
+
+Betreff: Anfrage zu Jugendprogrammen
+
+Sehr geehrte Damen und Herren,
+
+ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil ich mich für
+die Freizeitprogramme der Stadt Wien für Jugendliche interessiere.
+
+Könnten Sie mir bitte Informationen zu aktuellen Angeboten schicken?
+Besonders interessiere ich mich für Sportkurse und Sprachkurse.
+
+Ich freue mich auf Ihre Antwort.
+
+Mit freundlichen Grüßen,
+Max Mustermann`
+  },
+  {
+    id: "tagebuch",
+    title: "Tagebuch (Diary entry)",
+    register: "informal",
+    desc: "A personal, private written record of the author's thoughts, feelings, and experiences. It is always informal and written in the first person.",
+    criteria: [
+      "Salutation (Liebes Tagebuch, ...)",
+      "Date and place (Datum und Ort)",
+      "Closing farewell (e.g. Ich werde bald wieder schreiben! / Bis bald!)",
+      "Informal language throughout"
+    ],
+    guide: `How to write it:
+1. Begin with "Liebes Tagebuch," (Dear Diary,).
+2. Write the place and date.
+3. Write in the first person, informally — as if speaking to yourself.
+4. Describe what happened and how you felt about it.
+5. Include personal thoughts, questions, or hopes.
+6. End with a brief farewell phrase before signing off.`,
+    example: `Liebes Tagebuch,
+
+Wien, 4. Mai 2026
+
+Heute war wirklich ein besonderer Tag. In der Schule haben wir
+über den Klimawandel diskutiert, und ich hatte plötzlich das Gefühl,
+dass ich wirklich etwas verändern möchte.
+
+Ich weiß noch nicht genau wie — aber ich will mitmachen. Vielleicht
+fange ich damit an, weniger Fleisch zu essen. Mal sehen, ob das
+wirklich so schwer ist wie alle sagen!
+
+Bis bald,
+Lena`
+  }
+];
+
+function filter(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.card').forEach(card => {
+    if (type === 'all' || card.dataset.register === type) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function toggleCard(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('open');
+}
+
+const badgeLabel = { formal: 'Formal', informal: 'Informal', both: 'Formal or informal' };
+const badgeClass = { formal: 'badge-formal', informal: 'badge-informal', both: 'badge-both' };
+
+const grid = document.getElementById('grid');
+types.forEach(t => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = t.id;
+  card.dataset.register = t.register;
+  card.onclick = () => toggleCard(t.id);
+  card.innerHTML = `
+    <div class="card-header">
+      <span class="card-title">${t.title}</span>
+      <span class="badge ${badgeClass[t.register]}">${badgeLabel[t.register]}</span>
+      <span class="toggle">+</span>
+    </div>
+    <div class="card-body">
+      <div class="section">
+        <div class="section-label">Description</div>
+        <p class="desc-text">${t.desc}</p>
+      </div>
+      <div class="section">
+        <div class="section-label">IB criteria (required elements)</div>
+        <ul class="criteria-list">${t.criteria.map(c => `<li>${c}</li>`).join('')}</ul>
+      </div>
+      <div class="section">
+        <div class="section-label">How to write it</div>
+        <div class="example-box">${t.guide}</div>
+      </div>
+      <div class="section">
+        <div class="section-label">Example</div>
+        <div class="example-box">${t.example}</div>
+      </div>
+    </div>
+  `;
+  grid.appendChild(card);
+});
+</script>
