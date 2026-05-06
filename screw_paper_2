@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IB Paper 2 — WT & FH Revision Guide</title>
+
+<style>
+/* KEEP ALL YOUR EXISTING CSS EXACTLY AS IS */
+</style>
+
+<script>
+function showTab(tabId) {
+  const sections = document.querySelectorAll('.topic-section');
+  const buttons = document.querySelectorAll('.tab-btn');
+
+  sections.forEach(section => section.classList.remove('active'));
+  buttons.forEach(btn => btn.classList.remove('active'));
+
+  document.getElementById(tabId).classList.add('active');
+
+  event.target.classList.add('active');
+}
+
+// Scroll to top button
+window.addEventListener("scroll", () => {
+  const btn = document.querySelector(".scroll-top");
+  if (window.scrollY > 300) {
+    btn.style.display = "flex";
+  } else {
+    btn.style.display = "none";
+  }
+});
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+
+</head>
+
+<body>
+
+<!-- Fish GIF -->
+<div class="fish-corner">
+  <img src="https://amadeus.buzz/fish.gif" alt="fish" onerror="this.style.display='none'">
+</div>
+
+<header class="site-header">
+  <!-- KEEP YOUR EXISTING HEADER CONTENT -->
+</header>
+
+<main>
+  <!-- KEEP ALL YOUR EXISTING CONTENT HERE -->
+</main>
+
+<!-- Scroll to top -->
+<div class="scroll-top" onclick="scrollToTop()">↑</div>
+
+</body>
+</html>
